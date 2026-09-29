@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>연간 학습플래너</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f5f1;--card:#fff;--ink:#22252b;--mute:#7b8088;--line:#e4e2db;--acc:#3b6fd8;--l0:#eeece6;--l1:#c9dcf7;--l2:#93b8ef;--l3:#5b8fe3;--l4:#2d5fc4}
+:root[data-theme="dark"]{--bg:#16181d;--card:#1f2228;--ink:#e8e9ec;--mute:#8d939c;--line:#2f333b;--acc:#6b9bf0;--l0:#2a2d34;--l1:#27406b;--l2:#2f5a9e;--l3:#3f78cc;--l4:#6b9bf0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16181d;--card:#1f2228;--ink:#e8e9ec;--mute:#8d939c;--line:#2f333b;--acc:#6b9bf0;--l0:#2a2d34;--l1:#27406b;--l2:#2f5a9e;--l3:#3f78cc;--l4:#6b9bf0}}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.45}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+h1{font-size:20px;margin:0}
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.top .sp{flex:1}
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 12px}
+.btn:hover{border-color:var(--acc)}
+.pri{background:var(--acc);color:#fff;border-color:var(--acc)}
+.yr{font-size:18px;font-weight:700;min-width:64px;text-align:center}
+input,select{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-width:0}
+input:focus,select:focus{outline:2px solid var(--acc);outline-offset:-1px}
+.goal{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.goal input[type=text]{flex:1;min-width:180px}
+.goal input[type=number]{width:90px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.st{background:var(--bg);border-radius:10px;padding:10px 12px}
+.st b{display:block;font-size:20px}.st span{font-size:12px;color:var(--mute)}
+.bar{height:8px;background:var(--l0);border-radius:6px;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc)}
+.year{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.mh{background:none;border:0;font-weight:700;padding:2px 0;margin-bottom:4px}
+.mh:hover{color:var(--acc)}
+.g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.g .d{aspect-ratio:1;border:0;border-radius:4px;font-size:10px;color:var(--ink);position:relative;padding:0}
+.lv0{background:var(--l0)}.lv1{background:var(--l1)}.lv2{background:var(--l2)}.lv3{background:var(--l3);color:#fff!important}.lv4{background:var(--l4);color:#fff!important}
+.today{outline:2px solid var(--ink);outline-offset:-1px}
+.sel{box-shadow:0 0 0 2px var(--acc)}
+.plan::after{content:"";position:absolute;right:2px;top:2px;width:4px;height:4px;border-radius:50%;background:#e0655a}
+.legend{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--mute);margin-top:12px}
+.legend i{width:14px;height:14px;border-radius:3px;display:inline-block}
+.mwrap{overflow-x:auto}
+.mgrid{display:grid;grid-template-columns:repeat(7,minmax(90px,1fr));gap:4px;min-width:640px}
+.wd{text-align:center;font-size:12px;color:var(--mute);padding:4px}
+.cell{min-height:86px;border:1px solid var(--line);border-radius:8px;padding:4px 6px;background:var(--bg);text-align:left;display:block;width:100%;overflow:hidden}
+.cell.blank{border:0;background:none;cursor:default}
+.cell.today{outline:2px solid var(--ink);outline-offset:-2px}
+.cell .n{font-size:12px;font-weight:600}
+.chip{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;display:flex;gap:4px;align-items:center}
+.chip i{width:7px;height:7px;border-radius:50%;flex:none}
+.chip.done{text-decoration:line-through;color:var(--mute)}
+.row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+.row .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.row .t.done{text-decoration:line-through;color:var(--mute)}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.add{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.add input[type=text]{flex:1;min-width:140px}.add input[type=number]{width:80px}
+.x{background:none;border:0;color:var(--mute);font-size:16px}
+.x:hover{color:#e0655a}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tag{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:20px;padding:3px 6px 3px 10px;font-size:13px}
+h2{font-size:15px;margin:0 0 10px}
+.muted{color:var(--mute);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="top">
+      <h1>📚 연간 학습플래너</h1><span class="sp"></span>
+      <button class="btn" onclick="chYear(-1)" aria-label="이전 해">◀</button>
+      <span class="yr" id="yr"></span>
+      <button class="btn" onclick="chYear(1)" aria-label="다음 해">▶</button>
+      <button class="btn" onclick="toggleTheme()" aria-label="테마 전환">🌓</button>
+    </div>
+    <div class="goal">
+      <input type="text" id="goal" placeholder="올해의 학습 목표를 적어보세요" oninput="setGoal(this.value)">
+      <label class="muted" style="display:flex;align-items:center;gap:6px">목표 시간<input type="number" id="target" min="0" oninput="setTarget(this.value)">h</label>
+    </div>
+  </div>
+  <div class="card"><div class="stats" id="stats"></div></div>
+  <div class="card" id="view"></div>
+  <div class="card" id="panel"></div>
+  <div class="card">
+    <h2>과목 관리</h2>
+    <div class="chips" id="subs"></div>
+    <div class="add">
+      <input type="text" id="sn" placeholder="새 과목 이름" maxlength="20">
+      <input type="color" id="sc" value="#8a63d2" style="padding:2px;width:44px">
+      <button class="btn" onclick="addSubj()">과목 추가</button>
+    </div>
+  </div>
+  <p class="muted">데이터는 이 브라우저에만 저장돼요.</p>
+</div>
+<script>
+const KEY='studyPlanner.v1';
+let S={};
+try{S=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
+S.subjects=S.subjects||[{id:'s1',name:'국어',color:'#e0655a'},{id:'s2',name:'수학',color:'#4a7fd4'},{id:'s3',name:'영어',color:'#3aa57a'}];
+S.days=S.days||{};S.goals=S.goals||{};S.target=S.target||{};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const K=(y,m,d)=>`${y}-${pad(m+1)}-${pad(d)}`;
+const tasks=k=>S.days[k]||[];
+const doneMin=k=>tasks(k).filter(t=>t.done).reduce((a,t)=>a+t.min,0);
+const lv=m=>m<=0?0:m<60?1:m<120?2:m<240?3:4;
+const subj=id=>S.subjects.find(s=>s.id===id)||{name:'기타',color:'#999'};
+const now=new Date(),TODAY=K(now.getFullYear(),now.getMonth(),now.getDate());
+let year=now.getFullYear(),month=null,sel=TODAY;
+const WD=['일','월','화','수','목','금','토'];
+const fmt=m=>m>=60?`${Math.floor(m/60)}h${m%60?' '+m%60+'m':''}`:`${m}m`;
+
+function chYear(n){year+=n;month=null;render()}
+function chMonth(n){month+=n;if(month<0){month=11;year--}if(month>11){month=0;year++}render()}
+function openMonth(m){month=m;render()}
+function pick(k){sel=k;render();$('panel').scrollIntoView({behavior:'smooth',block:'nearest'})}
+function setGoal(v){S.goals[year]=v;save()}
+function setTarget(v){S.target[year]=Math.max(0,+v||0);save();stats()}
+function toggleTheme(){const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark'}
+
+function addTask(){
+  const t=$('nt').value.trim();if(!t)return;
+  const min=Math.max(0,parseInt($('nm').value)||0);
+  (S.days[sel]=S.days[sel]||[]).push({id:Date.now()+'',subj:$('ns').value,title:t,min,done:false});
+  save();render();$('nt').focus();
+}
+function toggle(id){const t=tasks(sel).find(x=>x.id===id);if(t){t.done=!t.done;save();render()}}
+function del(id){S.days[sel]=tasks(sel).filter(x=>x.id!==id);if(!S.days[sel].length)delete S.days[sel];save();render()}
+function addSubj(){
+  const n=$('sn').value.trim();if(!n)return;
+  S.subjects.push({id:'s'+Date.now(),name:n,color:$('sc').value});save();render();
+}
+function delSubj(id){
+  if(S.subjects.length<=1)return;
+  S.subjects=S.subjects.filter(s=>s.id!==id);save();render();
+}
+
+function grid(y,m){
+  const first=new Date(y,m,1).getDay(),n=new Date(y,m+1,0).getDate();
+  return {first,n};
+}
+function stats(){
+  let plan=0,done=0,pm=0,dm=0,days=0;
+  const p=year+'-';
+  for(const k in S.days){
+    if(!k.startsWith(p))continue;
+    const a=S.days[k];plan+=a.length;
+    const d=a.filter(t=>t.done);done+=d.length;
+    const m=d.reduce((s,t)=>s+t.min,0);dm+=m;if(m>0||d.length)days++;
+  }
+  let streak=0,c=new Date(now);
+  while(streak<800){const k=K(c.getFullYear(),c.getMonth(),c.getDate());
+    if(doneMin(k)>0||tasks(k).some(t=>t.done))streak++;
+    else if(!(streak===0&&k===TODAY))break;
+    c.setDate(c.getDate()-1)}
+  const tg=S.target[year]||0,pct=tg?Math.min(100,Math.round(dm/60/tg*100)):0;
+  $('stats').innerHTML=
+   `<div class="st"><b>${(dm/60).toFixed(1)}h</b><span>올해 공부한 시간${tg?` · 목표 ${pct}%`:''}</span>${tg?`<div class="bar"><i style="width:${pct}%"></i></div>`:''}</div>
+    <div class="st"><b>${done}/${plan}</b><span>완료한 계획${plan?` · ${Math.round(done/plan*100)}%`:''}</span></div>
+    <div class="st"><b>${days}일</b><span>공부한 날</span></div>
+    <div class="st"><b>${streak}일</b><span>현재 연속 기록</span></div>`;
+}
+function yearView(){
+  let h='<div class="year">';
+  for(let m=0;m<12;m++){
+    const {first,n}=grid(year,m);
+    h+=`<div><button class="mh" onclick="openMonth(${m})">${m+1}월</button><div class="g">`;
+    for(let i=0;i<first;i++)h+='<span></span>';
+    for(let d=1;d<=n;d++){
+      const k=K(year,m,d),mn=doneMin(k),pl=tasks(k).some(t=>!t.done);
+      h+=`<button class="d lv${lv(mn)}${k===TODAY?' today':''}${k===sel?' sel':''}${pl?' plan':''}" onclick="pick('${k}')" aria-label="${m+1}월 ${d}일">${d}</button>`;
+    }
+    h+='</div></div>';
+  }
+  h+='</div><div class="legend">적음';
+  for(let i=0;i<5;i++)h+=`<i class="lv${i}"></i>`;
+  h+='많음 · 빨간 점은 미완료 계획</div>';
+  return h;
+}
+function monthView(){
+  const {first,n}=grid(year,month);
+  let h=`<div class="top" style="margin-bottom:10px"><button class="btn" onclick="chMonth(-1)">◀</button><b style="font-size:16px">${year}년 ${month+1}월</b><button class="btn" onclick="chMonth(1)">▶</button><span class="sp"></span><button class="btn" onclick="month=null;render()">연간 보기</button></div><div class="mwrap"><div class="mgrid">`;
+  WD.forEach(w=>h+=`<div class="wd">${w}</div>`);
+  for(let i=0;i<first;i++)h+='<div class="cell blank"></div>';
+  for(let d=1;d<=n;d++){
+    const k=K(year,month,d),a=tasks(k);
+    h+=`<button class="cell${k===TODAY?' today':''}${k===sel?' sel':''}" onclick="pick('${k}')"><span class="n">${d}</span>`;
+    a.slice(0,3).forEach(t=>h+=`<div class="chip${t.done?' done':''}"><i style="background:${subj(t.subj).color}"></i>${esc(t.title)}</div>`);
+    if(a.length>3)h+=`<div class="chip muted">+${a.length-3}개 더</div>`;
+    h+='</button>';
+  }
+  return h+'</div></div>';
+}
+function panel(){
+  const [y,m,d]=sel.split('-').map(Number),a=tasks(sel);
+  const dt=new Date(y,m-1,d),tot=a.reduce((s,t)=>s+t.min,0),dn=doneMin(sel);
+  let h=`<h2>${y}년 ${m}월 ${d}일 (${WD[dt.getDay()]}) <span class="muted">${a.length?`· 계획 ${fmt(tot)} / 완료 ${fmt(dn)}`:''}</span></h2>`;
+  if(!a.length)h+='<p class="muted">아직 계획이 없어요. 아래에서 추가해보세요.</p>';
+  a.forEach(t=>{const s=subj(t.subj);
+    h+=`<div class="row"><input type="checkbox" ${t.done?'checked':''} onchange="toggle('${t.id}')" aria-label="완료"><span class="dot" style="background:${s.color}"></span><span class="t${t.done?' done':''}"><b>${esc(s.name)}</b> ${esc(t.title)}</span><span class="muted">${t.min?fmt(t.min):''}</span><button class="x" onclick="del('${t.id}')" aria-label="삭제">✕</button></div>`});
+  h+=`<div class="add"><select id="ns">${S.subjects.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select><input type="text" id="nt" placeholder="무엇을 공부할까요?" maxlength="60" onkeydown="if(event.key==='Enter')addTask()"><input type="number" id="nm" placeholder="분" min="0" step="5" value="60" onkeydown="if(event.key==='Enter')addTask()"><button class="btn pri" onclick="addTask()">추가</button></div>`;
+  return h;
+}
+function render(){
+  $('yr').textContent=year;
+  $('goal').value=S.goals[year]||'';
+  $('target').value=S.target[year]||'';
+  stats();
+  $('view').innerHTML=month===null?yearView():monthView();
+  $('panel').innerHTML=panel();
+  $('subs').innerHTML=S.subjects.map(s=>`<span class="tag"><span class="dot" style="background:${s.color}"></span>${esc(s.name)}<button class="x" onclick="delSubj('${s.id}')" aria-label="과목 삭제">✕</button></span>`).join('');
+}
+render();
+</script>
+</body>
+</html>
